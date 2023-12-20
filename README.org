@@ -1,0 +1,29 @@
+#+TITLE: Structhing
+* Installation
+From the root directory:
+#+begin_src bash
+  mvn clean package
+  java -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -jar ./delivery/target/structhing.jar
+#+end_src
+* As container
+First build the package:
+
+#+begin_src bash
+  mvn clean package
+#+end_src
+
+Than use following dockerfile:
+#+begin_src docker
+  FROM eclipse-temurin:17-jre
+  RUN mkdir /opt/app
+  COPY delivery/target/*.jar /opt/app/myApp.jar
+  CMD ["java", "-jar", "/opt/app/myApp.jar"]
+#+end_src
+* Backend
+Java Application
+
+Uses
+* Frontend
+Angular application
+
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`.
