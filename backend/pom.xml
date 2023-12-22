@@ -12,9 +12,10 @@
     <artifactId>backend</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <ch.hslu.structhing.backend.database.path>./src/main/resources/database/structhing</ch.hslu.structhing.backend.database.path>
     </properties>
 
     <dependencies>
@@ -41,18 +42,13 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>10.3.0</version>
+            <version>9.20.1</version>
         </dependency>
 
         <!-- jOOQ -->
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.19.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-codegen</artifactId>
             <version>3.19.0</version>
         </dependency>
     </dependencies>
@@ -62,25 +58,28 @@
         <plugin>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-maven-plugin</artifactId>
-            <version>9.17.0</version>
+            <executions>
+                <execution>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>migrate</goal>
+                    </goals>
+                </execution>
+            </executions>
             <configuration>
                 <!-- Configure your database connection settings here -->
-                <url>jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</url>
-                <user>your_username</user>
-                <password>your_password</password>
-                <schemas>
-                    <schema>public</schema>
-                </schemas>
+                <url>jdbc:h2:${ch.hslu.structhing.backend.database.path}</url>
+                <user>sa</user>
+                <password></password>
+                <validateMigrationNaming>true</validateMigrationNaming>
                 <locations>
-                    <location>filesystem:./src/main/resources/flyway</location>
+                    <location>filesystem:./src/main/resources/database/structure/</location>
                 </locations>
             </configuration>
         </plugin>
         <plugin>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-codegen-maven</artifactId>
-            <version>3.13.3</version>
-
             <executions>
                 <execution>
                     <id>jooq-codegen</id>
@@ -94,9 +93,9 @@
                 <!-- Configure the database connection here -->
                 <jdbc>
                     <driver>org.h2.Driver</driver>
-                    <url>jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</url>
-                    <user>your_username</user>
-                    <password>your_password</password>
+                    <url>jdbc:h2:${ch.hslu.structhing.backend.database.path}</url>
+                    <user>sa</user>
+                    <password></password>
                 </jdbc>
 
                 <generator>
@@ -115,7 +114,7 @@
 
                         <!-- The database schema (or in the absence of schema support, in your RDBMS this
                              can be the owner, user, database name) to be generated -->
-                        <inputSchema>public</inputSchema>
+                        <inputSchema>PUBLIC</inputSchema>
 
                         <!-- All elements that are generated from your schema
                              (A Java regular expression. Use the pipe to separate several expressions)
@@ -127,15 +126,17 @@
                         <!-- All elements that are excluded from your schema
                              (A Java regular expression. Use the pipe to separate several expressions).
                              Excludes match before includes, i.e. excludes have a higher priority -->
-                        <excludes></excludes>
+                        <excludes>
+                            flyway_schema_history
+                        </excludes>
                     </database>
 
                     <target>
                         <!-- The destination package of your generated classes (within the destination directory) -->
-                        <packageName>com.lordniksys.model.jooq.generated</packageName>
+                        <packageName>ch.hslu.structhing.backend.jooq.generated</packageName>
 
                         <!-- The destination directory of your generated classes. Using Maven directory layout here -->
-                        <directory>src/main/java/</directory>
+                        <directory>./src/main/java/</directory>
                     </target>
                 </generator>
             </configuration>
