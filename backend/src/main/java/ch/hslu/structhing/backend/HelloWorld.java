@@ -14,6 +14,8 @@ import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.Collections;
 
 import static ch.hslu.structhing.backend.jooq.generated.tables.Test.TEST;
@@ -35,5 +37,43 @@ public class HelloWorld {
                     Integer id = a.getId();
                     ctx.json(Collections.singletonMap("message", "Greetings from Javalin Web Server. Database id-entry is: !" + id.toString()));
                 }).start(7070);
+    }
+
+    public static void registerWatch() {
+        WatchService watchService
+                = null;
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Path path = Paths.get(System.getProperty("user.home"));
+
+        try {
+            path.register(
+                    watchService,
+                    StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        WatchKey key;
+        while (true) {
+            try {
+                if (!((key = watchService.take()) != null)) break;
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            for (WatchEvent<?> event : key.pollEvents()) {
+                System.out.println(
+                        "Event kind:" + event.kind()
+                                + ". File affected: " + event.context() + ".");
+            }
+            key.reset();
+        }
+    }
     }
 }

@@ -3,3 +3,4 @@ CREATE TABLE public.test (
 );
 
 INSERT INTO public.test(id) VALUES (1)
+,(12);

@@ -1,0 +1,81 @@
+openapi: 3.1.0
+info:
+  title: Structhing - API Specification
+  version: 0.0.1
+paths:
+  /api/watch/path/all:
+    get:
+      summary: Get all paths currently registred
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                message: "Hello, this is an example response."
+  /api/watch/path/{id}:
+    put:
+      summary: Create a new example
+      requestBody:
+        description: Example data
+        required: true
+        content:
+          application/json:
+            $ref: '#/StructWatchPath.yaml'
+            example:
+              data: "Example data for creation"
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+    delete:
+      summary: Delete an entry
+      requestBody:
+        description: Example data
+        required: true
+        content:
+          application/json:
+            $ref: '#/StructWatchPath.yaml'
+            example:
+              data: "Example data for creation"
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+    post:
+      summary: Update an entry
+      requestBody:
+        description: Example data
+        required: true
+        content:
+          application/json:
+            $ref: '#/StructWatchPath.yaml'
+            example:
+              data: "Example data for creation"
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+  /api/watch/path/{id}/open:
+    get:
+      summary: Get all files within this path
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                message: "Hello, this is an example response."
+  /api/file/path/{id}:
+    post:
+      summary: Reprocess, Reset, or exclude an file
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                message: "Hello, this is an example response."
