@@ -1,3 +1,4 @@
+package ch.hslu.structhing.backend.structwatch;
 /*
  * Copyright (c) 2008, 2010, Oracle and/or its affiliates. All rights reserved.
  *
@@ -6,7 +7,7 @@
  * are met:
  *
  *   - Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ *     notice,  this list of conditions and the following disclaimer.
  *
  *   - Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
@@ -29,23 +30,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardWatchEventKinds.*;
-import static java.nio.file.LinkOption.*;
-import java.nio.file.attribute.*;
-import java.io.*;
-import java.util.*;
 
 /**
  * Example to watch a directory (or tree) for changes to files.
  */
 
-public class WatchDir {
+public class WatchServiceRecursiveSupport {
 
-    private final WatchService watcher;
+    public static final String PDF = ".pdf";
+    public static final String COUNTER_SEPARATOR = "-";
+    private final java.nio.file.WatchService watcher;
     private final Map<WatchKey,Path> keys;
     private final boolean recursive;
-    private boolean trace = false;
+    private boolean trace = true;
+    private java.nio.file.WatchService watchService = FileSystems.getDefault().newWatchService();
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
@@ -56,7 +72,7 @@ public class WatchDir {
      * Register the given directory with the WatchService
      */
     private void register(Path dir) throws IOException {
-        WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+        WatchKey key = dir.register(watcher, ENTRY_CREATE);
         if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
@@ -87,22 +103,13 @@ public class WatchDir {
         });
     }
 
-    /**
-     * Creates a WatchService and registers the given directory
-     */
-    WatchDir(Path dir, boolean recursive) throws IOException {
-        this.watcher = FileSystems.getDefault().newWatchService();
+    WatchServiceRecursiveSupport(List<Path> directoryPaths, boolean recursive) throws IOException {
+        this.watcher = watchService;
         this.keys = new HashMap<WatchKey,Path>();
         this.recursive = recursive;
-
-        if (recursive) {
-            System.out.format("Scanning %s ...\n", dir);
-            registerAll(dir);
-            System.out.println("Done.");
-        } else {
-            register(dir);
+        for (Path directoryPath : directoryPaths) {
+            register(directoryPath);
         }
-
         // enable trace after initial registration
         this.trace = true;
     }
@@ -140,8 +147,49 @@ public class WatchDir {
                 Path name = ev.context();
                 Path child = dir.resolve(name);
 
-                // print out event
+                // PDF Detection
+                if (getFileExtension(name).equalsIgnoreCase(PDF)) {
+                    System.out.println("It's a PDF!!!!");
+
+                    try (PDDocument document = Loader.loadPDF(child.toFile())) {
+                        System.out.println("our Title: " + document.getDocumentInformation().getTitle());// TODO consider title if not null
+                        PDFTextStripper stripper = new PDFTextStripper();
+                        String text = stripper.getText(document);
+
+                        List<String> words = Stream.of(text.split(" "))
+                                .filter(a -> a != null && !a.equals("") && !a.equals("\n"))// TODO white space regex
+                                .map(a -> a.replace("\n", "")) // TODO regex for filtering special characters
+                                .map(a -> a.replace(",", ""))
+                                .map(a -> a.replace(File.separator, ""))
+                                .collect(Collectors.toList());
+                        Path newPathName = Path.of(child.getParent().toAbsolutePath()+File.separator+words.get(0)+words.get(1)+words.get(2)+PDF);
+                        int counter = 1;
+                        while(Files.exists(newPathName)) {
+                            newPathName = Path.of(newPathName.toAbsolutePath().toString().replace(PDF, COUNTER_SEPARATOR + counter + PDF));
+                            if (counter >= Integer.MAX_VALUE) {
+                                throw new RuntimeException("I cant handle that anymore");
+                            } else {
+                                counter++;
+                            }
+                        }
+                        Files.move(child,
+                                newPathName,
+                                REPLACE_EXISTING); // TODO better move options
+
+                        System.out.println("our new file name: " + newPathName);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                // AI Themen
+                // Ist AI-predict langsam?
+                // ISt AI Model laufen auf Customer Gerät, machbar? sinnhaft?
+
+
                 System.out.format("%s: %s\n", event.kind().name(), child);
+
+
 
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
@@ -169,26 +217,32 @@ public class WatchDir {
         }
     }
 
-    static void usage() {
-        System.err.println("usage: java WatchDir [-r] dir");
-        System.exit(-1);
+    private String getFileExtension(File file) {
+        String name = file.getName();
+        int lastIndexOf = name.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return null; // empty extension
+        }
+        return name.substring(lastIndexOf);
+    }
+
+    private String getFileExtension(Path file) {
+     return getFileExtension(file.toFile());
     }
 
     public static void main(String[] args) throws IOException {
-        // parse arguments
-        if (args.length == 0 || args.length > 2)
-            usage();
-        boolean recursive = false;
-        int dirArg = 0;
-        if (args[0].equals("-r")) {
-            if (args.length < 2)
-                usage();
-            recursive = true;
-            dirArg++;
-        }
-
         // register directory and process its events
-        Path dir = Paths.get(args[dirArg]);
-        new WatchDir(dir, recursive).processEvents();
+        List<Path> directoryPaths = Stream.of(
+                        "/home/lordnik/Pictures/",
+                        "/home/lordnik/Downloads/",
+                        "/home/lordnik/Videos/")
+                .map(Paths::get)
+                .collect(Collectors.toList());
+
+        WatchServiceRecursiveSupport a = new WatchServiceRecursiveSupport(directoryPaths, false);
+        // API CALL
+        // a.addWatchPath(unmarshalred json);
+        // WATCH THREAD
+        a.processEvents();
     }
 }
