@@ -1,7 +1,7 @@
 package ch.hslu.structhing.backend;
 
 import ch.hslu.structhing.backend.api.model.StructWatchPath;
-import ch.hslu.structhing.backend.jooq.generated.tables.records.TestRecord;
+import ch.hslu.structhing.backend.jooq.generated.Tables;
 import ch.hslu.structhing.backend.mapper.StructWatchMapper;
 import ch.hslu.structhing.backend.structwatch.StructWatchService;
 import io.javalin.Javalin;
@@ -17,11 +17,10 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import static ch.hslu.structhing.backend.jooq.generated.tables.StructWatchPath.STRUCT_WATCH_PATH;
-import static ch.hslu.structhing.backend.jooq.generated.tables.Test.TEST;
 
 public class Application {
     static int iter = 0;
-    static DSLContext dsl = DSL.using("jdbc:h2:./src/main/resources/database/structhing","sa","");
+    static DSLContext dsl = DSL.using("jdbc:h2:/home/lordnik/Documents/structhing/backend/src/main/resources/database/structhing","sa","");
     static StructWatchService watchService ;
 //    public static void main(String[] args) {
 //        Javalin.create(config -> {
@@ -43,6 +42,7 @@ public class Application {
 //    }
 
     public static void main(String[] args) {
-
+        dsl.select(Tables.STRUCT_WATCH_FILE.asterisk()).from(Tables.STRUCT_WATCH_FILE).fetch();
+        System.out.println("yes we succeeded.");
     }
 }

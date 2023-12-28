@@ -40,7 +40,7 @@ import java.util.*;
  * Example to watch a directory (or tree) for changes to files.
  */
 
-public class WatchService {
+public class WatchServiceA {
 
     private final java.nio.file.WatchService watcher;
     private final Map<WatchKey,Path> keys;
@@ -70,7 +70,7 @@ public class WatchService {
     /**
      * Creates a WatchService and registers the given directory
      */
-    WatchService(Path dir) throws IOException {
+    WatchServiceA(Path dir) throws IOException {
         this.watcher = watchService;
         this.keys = new HashMap<WatchKey,Path>();
         register(dir);

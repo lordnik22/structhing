@@ -31,9 +31,13 @@ package ch.hslu.structhing.backend.structwatch;
  */
 
 
+import ch.hslu.structhing.backend.jooq.generated.Tables;
+import ch.hslu.structhing.backend.jooq.generated.tables.records.StructWatchFileRecord;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,10 +46,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -57,11 +63,11 @@ public class WatchServiceRecursiveSupport {
 
     public static final String PDF = ".pdf";
     public static final String COUNTER_SEPARATOR = "-";
-    private final java.nio.file.WatchService watcher;
     private final Map<WatchKey,Path> keys;
     private final boolean recursive;
+    private final DSLContext dsl;
     private boolean trace = true;
-    private java.nio.file.WatchService watchService = FileSystems.getDefault().newWatchService();
+    private final WatchService watchService = FileSystems.getDefault().newWatchService();
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
@@ -72,7 +78,7 @@ public class WatchServiceRecursiveSupport {
      * Register the given directory with the WatchService
      */
     private void register(Path dir) throws IOException {
-        WatchKey key = dir.register(watcher, ENTRY_CREATE);
+        WatchKey key = dir.register(watchService, ENTRY_CREATE);
         if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
@@ -103,8 +109,8 @@ public class WatchServiceRecursiveSupport {
         });
     }
 
-    WatchServiceRecursiveSupport(List<Path> directoryPaths, boolean recursive) throws IOException {
-        this.watcher = watchService;
+    WatchServiceRecursiveSupport(List<Path> directoryPaths, DSLContext dsl, boolean recursive) throws IOException {
+        this.dsl = dsl;
         this.keys = new HashMap<WatchKey,Path>();
         this.recursive = recursive;
         for (Path directoryPath : directoryPaths) {
@@ -123,7 +129,7 @@ public class WatchServiceRecursiveSupport {
             // wait for key to be signalled
             WatchKey key;
             try {
-                key = watcher.take();
+                key = watchService.take();
             } catch (InterruptedException x) {
                 return;
             }
@@ -146,9 +152,8 @@ public class WatchServiceRecursiveSupport {
                 WatchEvent<Path> ev = cast(event);
                 Path name = ev.context();
                 Path child = dir.resolve(name);
-
-                // PDF Detection
-                if (getFileExtension(name).equalsIgnoreCase(PDF)) {
+                String fileExtenstion = getFileExtension(name);
+                if (fileExtenstion != null && fileExtenstion.equalsIgnoreCase(PDF)) {
                     System.out.println("It's a PDF!!!!");
 
                     try (PDDocument document = Loader.loadPDF(child.toFile())) {
@@ -162,34 +167,45 @@ public class WatchServiceRecursiveSupport {
                                 .map(a -> a.replace(",", ""))
                                 .map(a -> a.replace(File.separator, ""))
                                 .collect(Collectors.toList());
-                        Path newPathName = Path.of(child.getParent().toAbsolutePath()+File.separator+words.get(0)+words.get(1)+words.get(2)+PDF);
-                        int counter = 1;
+
+                        // AI Themen
+                        // Ist AI-predict langsam?
+                        // ISt AI Model laufen auf Customer Gerät, machbar? sinnhaft?
+                        String stringPath = child.getParent().toAbsolutePath()
+                                + File.separator
+                                + words.get(0)
+                                + words.get(1)
+                                + words.get(2);
+                        int counter = 0;
+                        Path newPathName = Path.of(stringPath + PDF);
                         while(Files.exists(newPathName)) {
-                            newPathName = Path.of(newPathName.toAbsolutePath().toString().replace(PDF, COUNTER_SEPARATOR + counter + PDF));
                             if (counter >= Integer.MAX_VALUE) {
                                 throw new RuntimeException("I cant handle that anymore");
                             } else {
                                 counter++;
                             }
+                            newPathName = Path.of(stringPath + COUNTER_SEPARATOR + counter + PDF);
                         }
-                        Files.move(child,
-                                newPathName,
-                                REPLACE_EXISTING); // TODO better move options
-
-                        System.out.println("our new file name: " + newPathName);
+                        System.out.println("our new file name: " + stringPath);
+                        boolean existNew = dsl.fetchExists(dsl.selectOne()
+                                .from(Tables.STRUCT_WATCH_FILE)
+                                .where(Tables.STRUCT_WATCH_FILE.CURRENT_FILE_PATH.eq(child.toAbsolutePath().toString())));
+                        if (existNew && counter >= 0) {
+                            continue;
+                        } else {
+                            Files.move(child, newPathName, ATOMIC_MOVE);
+                            dsl.insertInto(Tables.STRUCT_WATCH_FILE, Tables.STRUCT_WATCH_FILE.CURRENT_FILE_PATH,Tables.STRUCT_WATCH_FILE.OLD_FILE_PATH)
+                                    .values(newPathName.toAbsolutePath().toString(),
+                                            child.toAbsolutePath().toString())
+                                    .execute();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
                 }
-                // AI Themen
-                // Ist AI-predict langsam?
-                // ISt AI Model laufen auf Customer Gerät, machbar? sinnhaft?
-
 
                 System.out.format("%s: %s\n", event.kind().name(), child);
-
-
 
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
@@ -238,8 +254,8 @@ public class WatchServiceRecursiveSupport {
                         "/home/lordnik/Videos/")
                 .map(Paths::get)
                 .collect(Collectors.toList());
-
-        WatchServiceRecursiveSupport a = new WatchServiceRecursiveSupport(directoryPaths, false);
+        DSLContext dsl = DSL.using("jdbc:h2:/home/lordnik/Documents/structhing/backend/src/main/resources/database/structhing","sa","");
+        WatchServiceRecursiveSupport a = new WatchServiceRecursiveSupport(directoryPaths, dsl, false);
         // API CALL
         // a.addWatchPath(unmarshalred json);
         // WATCH THREAD
