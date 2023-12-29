@@ -1,6 +1,4 @@
-package ch.hslu.structhing.backend.model;
-
-import java.time.Instant;
+package ch.hslu.structhing.backend.api.model;
 
 public class StructFilePath {
     private String currentFileName;

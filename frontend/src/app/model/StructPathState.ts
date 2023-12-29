@@ -1,4 +1,4 @@
-package ch.hslu.structhing.backend.model;
+package ch.hslu.structhing.backend.api.model;
 
 enum StructPathState {
     INIT,

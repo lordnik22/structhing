@@ -22,7 +22,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>ch.hslu.structhing.backend.HelloWorld</mainClass>
+                  <mainClass>ch.hslu.structhing.backend.Application</mainClass>
                 </transformer>
               </transformers>
               <filters>
