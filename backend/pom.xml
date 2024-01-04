@@ -15,7 +15,8 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <ch.hslu.structhing.backend.database.path>${project.basedir}/src/main/resources/database/structhing</ch.hslu.structhing.backend.database.path>
+        <ch.hslu.structhing.backend.database.path>${project.basedir}/src/main/resources/database/structhing
+        </ch.hslu.structhing.backend.database.path>
     </properties>
 
     <dependencies>
@@ -62,6 +63,39 @@
             <artifactId>api</artifactId>
             <version>0.25.0</version>
         </dependency>
+        <dependency>
+            <groupId>ai.djl</groupId>
+            <artifactId>model-zoo</artifactId>
+            <version>0.25.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.djl.pytorch</groupId>
+            <artifactId>pytorch-engine</artifactId>
+            <version>0.25.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.djl.pytorch</groupId>
+            <artifactId>pytorch-native-cpu</artifactId>
+            <classifier>linux-x86_64</classifier>
+            <scope>runtime</scope>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ai.djl.pytorch</groupId>
+            <artifactId>pytorch-jni</artifactId>
+            <version>2.0.1-0.25.0</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.openpnp</groupId>
+            <artifactId>opencv</artifactId>
+            <version>4.9.0-0</version>
+        </dependency>
+
 
         <!-- DJL Hugging Face Library -->
         <dependency>
@@ -69,96 +103,97 @@
             <artifactId>tokenizers</artifactId>
             <version>0.25.0</version>
         </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
-        <plugin>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-maven-plugin</artifactId>
-            <executions>
-                <execution>
-                    <phase>generate-sources</phase>
-                    <goals>
-                        <goal>migrate</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <!-- Configure your database connection settings here -->
-                <url>jdbc:h2:${ch.hslu.structhing.backend.database.path}</url>
-                <user>sa</user>
-                <password></password>
-                <validateMigrationNaming>true</validateMigrationNaming>
-                <locations>
-                    <location>filesystem:./src/main/resources/database/structure/</location>
-                </locations>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-codegen-maven</artifactId>
-            <executions>
-                <execution>
-                    <id>jooq-codegen</id>
-                    <phase>generate-sources</phase>
-                    <goals>
-                        <goal>generate</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <!-- Configure the database connection here -->
-                <jdbc>
-                    <driver>org.h2.Driver</driver>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Configure your database connection settings here -->
                     <url>jdbc:h2:${ch.hslu.structhing.backend.database.path}</url>
                     <user>sa</user>
                     <password></password>
-                </jdbc>
+                    <validateMigrationNaming>true</validateMigrationNaming>
+                    <locations>
+                        <location>filesystem:./src/main/resources/database/structure/</location>
+                    </locations>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <executions>
+                    <execution>
+                        <id>jooq-codegen</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Configure the database connection here -->
+                    <jdbc>
+                        <driver>org.h2.Driver</driver>
+                        <url>jdbc:h2:${ch.hslu.structhing.backend.database.path}</url>
+                        <user>sa</user>
+                        <password></password>
+                    </jdbc>
 
-                <generator>
-                    <!-- The default code generator. You can override this one, to generate your own code style.
-                         Supported generators:
-                         - org.jooq.codegen.JavaGenerator
-                         - org.jooq.codegen.KotlinGenerator
-                         - org.jooq.codegen.ScalaGenerator
-                         Defaults to org.jooq.codegen.JavaGenerator -->
-                    <name>org.jooq.codegen.JavaGenerator</name>
+                    <generator>
+                        <!-- The default code generator. You can override this one, to generate your own code style.
+                             Supported generators:
+                             - org.jooq.codegen.JavaGenerator
+                             - org.jooq.codegen.KotlinGenerator
+                             - org.jooq.codegen.ScalaGenerator
+                             Defaults to org.jooq.codegen.JavaGenerator -->
+                        <name>org.jooq.codegen.JavaGenerator</name>
 
-                    <database>
-                        <!-- The database type. The format here is:
-                             org.jooq.meta.[database].[database]Database -->
-                        <name>org.jooq.meta.h2.H2Database</name>
+                        <database>
+                            <!-- The database type. The format here is:
+                                 org.jooq.meta.[database].[database]Database -->
+                            <name>org.jooq.meta.h2.H2Database</name>
 
-                        <!-- The database schema (or in the absence of schema support, in your RDBMS this
-                             can be the owner, user, database name) to be generated -->
-                        <inputSchema>PUBLIC</inputSchema>
+                            <!-- The database schema (or in the absence of schema support, in your RDBMS this
+                                 can be the owner, user, database name) to be generated -->
+                            <inputSchema>PUBLIC</inputSchema>
 
-                        <!-- All elements that are generated from your schema
-                             (A Java regular expression. Use the pipe to separate several expressions)
-                             Watch out for case-sensitivity. Depending on your database, this might be important! -->
-                        <includes>
-                            .*
-                        </includes>
+                            <!-- All elements that are generated from your schema
+                                 (A Java regular expression. Use the pipe to separate several expressions)
+                                 Watch out for case-sensitivity. Depending on your database, this might be important! -->
+                            <includes>
+                                .*
+                            </includes>
 
-                        <!-- All elements that are excluded from your schema
-                             (A Java regular expression. Use the pipe to separate several expressions).
-                             Excludes match before includes, i.e. excludes have a higher priority -->
-                        <excludes>
-                            flyway_schema_history
-                        </excludes>
-                    </database>
+                            <!-- All elements that are excluded from your schema
+                                 (A Java regular expression. Use the pipe to separate several expressions).
+                                 Excludes match before includes, i.e. excludes have a higher priority -->
+                            <excludes>
+                                flyway_schema_history
+                            </excludes>
+                        </database>
 
-                    <target>
-                        <!-- The destination package of your generated classes (within the destination directory) -->
-                        <packageName>ch.hslu.structhing.backend.jooq.generated</packageName>
+                        <target>
+                            <!-- The destination package of your generated classes (within the destination directory) -->
+                            <packageName>ch.hslu.structhing.backend.jooq.generated</packageName>
 
-                        <!-- The destination directory of your generated classes. Using Maven directory layout here -->
-                        <directory>./src/main/java/</directory>
-                    </target>
-                </generator>
-            </configuration>
-        </plugin>
+                            <!-- The destination directory of your generated classes. Using Maven directory layout here -->
+                            <directory>./src/main/java/</directory>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

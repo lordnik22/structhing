@@ -50,7 +50,8 @@ build/
 !**/src/test/**/build/
 
 **/src/main/resources/public
-
+*.mv.db
+*.trace.db
 ### VS Code ###
 .vscode/
 
