@@ -1,0 +1,39 @@
+/* .site-wrapper {
+    display: grid;
+    grid-template-areas: "nav   content"
+        "debug debug";
+    grid-template-rows: 1fr 1.5rem;
+    grid-template-columns: min(300px, 20%) 1fr;
+    height: 100%;
+    background-color: var(--color--main-bg);
+} */
+
+.content-wrapper {
+    grid-area: content;
+    padding: 4rem;
+    width: min(1000px, (100% - (2 * 4rem)));
+    box-sizing: content-box;
+}
+
+mat-sidenav {
+    width: 180px;
+}
+
+.mat-drawer-container {
+    height: calc(100% - 64px);
+}
+
+mat-toolbar .title {
+    margin: .5rem 0;
+
+    color: #fba071;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+mat-toolbar .version {
+    font-size: .75rem;
+    font-family: 'SourceCodePro';
+}

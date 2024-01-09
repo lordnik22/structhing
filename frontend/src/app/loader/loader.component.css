@@ -1,0 +1,18 @@
+:host {
+    position: absolute;
+    inset: 0;
+
+    z-index: 999;
+
+    pointer-events: none;
+}
+
+.loader-wrapper {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+
+    background-color: white;
+}
