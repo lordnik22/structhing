@@ -7,6 +7,6 @@ import { faFolder, faFile } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./struct-file-list.component.css']
 })
 export class StructFileListComponent {
-  // faFolder = faFolder;
-  faFolder = faFile;
+  faFolder = faFolder;
+  // faFolder = faFile;
 }

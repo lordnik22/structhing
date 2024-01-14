@@ -26,6 +26,6 @@ export class LoaderComponent {
   }
 
   loadPaths() {
-    setTimeout(this.fadeOut.bind(this), 0);
+    setTimeout(this.fadeOut.bind(this), 500);
   }
 }

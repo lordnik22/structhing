@@ -13,25 +13,7 @@
     height: 100%;
 }
 
-.logo-wrapper {
-    justify-self: center;
-    align-self: center;
-
-    text-align: center;
-}
-
-.logo {
-    max-height: 4rem;
-}
-
-.logo-wrapper > * {
-    display: block;
-}
-
-.logo-wrapper > a {
-    margin: .5rem 0;
-    text-transform: uppercase;
-    font-weight: bold;
-    color: #fba071;
-    text-decoration: none;
+.version {
+    font-size: .75rem;
+    font-family: 'SourceCodePro';
 }

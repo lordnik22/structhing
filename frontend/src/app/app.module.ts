@@ -30,6 +30,8 @@ import { StructFileListComponent } from './struct-file-list/struct-file-list.com
 import { StructPathListComponent } from './struct-path-list/struct-path-list.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { DialogComponent } from './dialog/dialog.component';
+import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -38,7 +40,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     StructFileListComponent,
     LoaderComponent,
     LogsComponent,
-    DashboardComponent
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -64,8 +66,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     RouterModule,
     FontAwesomeModule,
     MatSidenavModule,
+    DialogComponent,
   ],
-  providers: [],
+  providers: [
+  ],
   bootstrap: [AppComponent]
 })
 

@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
+    --mdc-theme-primary: hotpink;
     /* --color--main-bg: #fff;
     --mdc-theme-primary: #123;
     --mdc-theme-secondary: #456;

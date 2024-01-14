@@ -6,5 +6,4 @@ import { Component } from '@angular/core';
   styleUrls: ['./struct-path-list.component.css'],
 })
 export class StructPathListComponent {
-  fileLists = [1,2,3,4,5];
 }

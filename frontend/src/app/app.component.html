@@ -1,12 +1,12 @@
-<app-loader></app-loader>
-
 <mat-toolbar>
-    <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <button mat-icon-button aria-label="Show/hide navigation">
         <mat-icon>menu</mat-icon>
     </button>
     <a class="title" routerLink="['/']">Structhing</a>
     <span class="flex-spacer"></span>
-    <span class="version">Version {{appVersion}}</span>
+    <div class="logo-wrapper">
+        <img class="logo" src="assets/logo.svg">
+    </div>
 </mat-toolbar>
 
 <mat-sidenav-container class="example-container">
