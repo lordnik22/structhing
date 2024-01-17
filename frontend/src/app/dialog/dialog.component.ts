@@ -13,10 +13,11 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { DirectoryPickerService } from './directory-picker.service';
 
 export interface DialogData {
-  animal: string;
-  name: string;
+  createDate: string;
+  directoryPath: string;
 }
 
 @Component({
@@ -32,21 +33,20 @@ export class DialogComponent {
 
   constructor(public dialog: MatDialog) {}
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-      data: { name: this.name, animal: this.animal },
-    });
+  openDirectoryPicker(): void {
+    const dialogRef = this.dialog.open(DirectoryPickerDialogComponent);
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      this.animal = result;
+    dialogRef.afterClosed().subscribe((selectedDirectory: string | undefined) => {
+      if (selectedDirectory) {
+        console.log('Selected directory:', selectedDirectory);
+        // Do something with the selected directory path
+      }
     });
   }
 }
 
 @Component({
-  selector: 'app-dashboard-dialog',
-  templateUrl: 'dashboard-dialog.component.html',
+  selector: 'app-directory-picker-dialog',
   standalone: true,
   imports: [
     MatFormFieldModule,
@@ -58,14 +58,35 @@ export class DialogComponent {
     MatDialogActions,
     MatDialogClose,
   ],
+  template: `
+    <h2 mat-dialog-title>Choose Directory</h2>
+    <mat-dialog-content>
+      <p>Select a directory:</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button (click)="cancel()">Cancel</button>
+      <button mat-button (click)="selectDirectory()">Select Directory</button>
+    </mat-dialog-actions>
+  `
 })
-export class DialogOverviewExampleDialog {
+export class DirectoryPickerDialogComponent {
   constructor(
-    public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) { }
+    private dialogRef: MatDialogRef<DirectoryPickerDialogComponent>,
+    private directoryPickerService: DirectoryPickerService
+  ) {}
 
-  onNoClick(): void {
+  cancel(): void {
     this.dialogRef.close();
   }
+
+  async selectDirectory(): Promise<void> {
+    const directory = await this.directoryPickerService.pickDirectory();
+    if (directory) {
+      this.dialogRef.close(directory);
+    }
+  }
+
+  // async change(event): Promise<void> {
+  //   console.log(event);
+  // }
 }
