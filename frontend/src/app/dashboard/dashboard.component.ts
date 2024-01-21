@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { DialogComponent } from '../dialog/dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,10 +9,19 @@ import { Component } from '@angular/core';
 })
 export class DashboardComponent {
   baseURL = 'http://localhost:7070';
+  loadingStatus: boolean = true;
   pathLists = [];
+  message: string;
+
   constructor(private http: HttpClient) {
     this.pathLists = [1,2,3,4,5];
     // this.getAllPaths();
+  }
+
+  ngOnInit() {
+    setTimeout(() => {
+      this.loadingStatus = false;
+    }, 500);
   }
 
   getAllPaths() {
@@ -28,7 +38,6 @@ export class DashboardComponent {
   }
 
   addPath(path: string) {
-    console.log(path);
     const headers = new HttpHeaders();
 
     this.http.put(
@@ -36,11 +45,16 @@ export class DashboardComponent {
       path, {headers: headers}
     )
     .subscribe((res) => {
-      console.log(res);
+      this.getAllPaths();
     });
   }
 
   openDialog() {
     console.log('test');
+  }
+
+  receiveMessage($event) {
+    this.message = $event;
+    this.addPath(this.message);
   }
 }

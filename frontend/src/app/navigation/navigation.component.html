@@ -1,14 +1,15 @@
-<nav mat-list role="list">
+<mat-list role="list">
     <a mat-list-item
         role="listitem"
-        [routerLink]="['/']">
+        [routerLink]="['/']"
+        class="mat-mdc-list-item mdc-list-item mat-mdc-list-item-interactive mat-mdc-list-item-single-line mdc-list-item--with-one-line ng-star-inserted">
         Verzeichnisse
     </a>
     <a mat-list-item
         role="listitem"
-        [routerLink]="['/logs']">
+        [routerLink]="['/logs']"
+        class="mat-mdc-list-item mdc-list-item mat-mdc-list-item-interactive mat-mdc-list-item-single-line mdc-list-item--with-one-line ng-star-inserted">
         Logs
     </a>
-</nav>
-<span class="flex-spacer"></span>
+</mat-list>
 <span class="version">v{{appVersion}}</span>

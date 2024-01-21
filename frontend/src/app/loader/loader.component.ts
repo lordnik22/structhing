@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
@@ -8,24 +8,24 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   animations: [
     trigger('fade', [
       state('visible', style({ opacity: 1 })),
-      state('hidden', style({ opacity: 0, pointerEvents: 'none' })),
+      state('hidden', style({ opacity: 0 })),
       transition('visible <=> hidden', animate('.3s ease-in-out')),
     ]),
   ],
 })
 
 export class LoaderComponent {
-  initialized = false;
+  @Input() isLoading: boolean;
 
-  ngOnInit() {
-    this.loadPaths();
-  }
+  // ngOnInit() {
+  //   this.loadPaths();
+  // }
 
-  fadeOut() {
-    this.initialized = this.initialized ? false : true;
-  }
+  // fadeOut() {
+  //   this.isLoading = this.isLoading ? false : true;
+  // }
 
-  loadPaths() {
-    setTimeout(this.fadeOut.bind(this), 500);
-  }
+  // loadPaths() {
+  //   setTimeout(this.fadeOut.bind(this), 500);
+  // }
 }

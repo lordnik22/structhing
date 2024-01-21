@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import {
   MatDialog,
   MAT_DIALOG_DATA,
@@ -15,7 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 
 export interface DialogData {
-  animal: string;
+  path: string;
   name: string;
 }
 
@@ -27,19 +27,21 @@ export interface DialogData {
   imports: [MatFormFieldModule, MatInputModule, FormsModule, MatButtonModule, MatIconModule]
 })
 export class DialogComponent {
-  animal: string;
+  addPath: string;
   name: string;
 
   constructor(public dialog: MatDialog) {}
 
+  @Output() messageEvent = new EventEmitter<string>();
+
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-      data: { name: this.name, animal: this.animal },
+      data: { name: this.name, path: this.addPath },
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      this.animal = result;
+      this.addPath = result;
+      this.messageEvent.emit(this.addPath)
     });
   }
 }

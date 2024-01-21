@@ -24,7 +24,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AppRoutingModule } from './app-routing.module';
 import { LoaderComponent } from './loader/loader.component';
-import { LogsComponent } from './logs/logs.component';
+import { LogsComponent } from './logz/logz.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import { StructFileListComponent } from './struct-file-list/struct-file-list.component';
 import { StructPathListComponent } from './struct-path-list/struct-path-list.component';
