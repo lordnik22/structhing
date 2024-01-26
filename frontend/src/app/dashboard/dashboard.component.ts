@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { DialogComponent } from '../dialog/dialog.component';
+import { faFolder, faFile } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,15 +11,16 @@ import { DialogComponent } from '../dialog/dialog.component';
 export class DashboardComponent {
   baseURL = 'http://localhost:7070';
   loadingStatus: boolean = true;
-  pathLists = [];
+  pathLists: any[] = [];
   message: string;
 
   constructor(private http: HttpClient) {
-    this.pathLists = [1,2,3,4,5];
-    // this.getAllPaths();
+    this.loadSkeletonData();
+    this.getAllPaths();
   }
 
   ngOnInit() {
+    // TODO: Remove me when loading works
     setTimeout(() => {
       this.loadingStatus = false;
     }, 500);
@@ -32,17 +34,45 @@ export class DashboardComponent {
       {headers: headers}
     )
     .subscribe((res) => {
-      console.log(res);
-      console.log(this.pathLists);
+      // TODO: Add directories from res to pathLists like below
+      this.pathLists = [
+        {
+          directory: {
+              id: 'c875afc6-e949-4c51-a71f-e086b7b379d9',
+              createDate: '2023-12-17 17:12',
+              directoryPath: 'C:\\Users\\johndoe\\Downloads',
+              fileSize: '—',
+              fileType: faFolder
+            },
+        },
+        {
+          directory: {
+              id: 'cd93a627-22c2-49e6-8b9c-c99a67fce137',
+              createDate: '2023-12-17 17:12',
+              directoryPath: 'C:\\Users\\johndoe\\Downloads',
+              fileSize: '—',
+              fileType: faFolder
+            },
+        },
+      ];
+
+      this.loadingStatus = false;
     });
   }
 
   addPath(path: string) {
-    const headers = new HttpHeaders();
-
     this.http.put(
       this.baseURL + '/api/watch/path',
-      path, {headers: headers}
+      path
+    )
+    .subscribe((res) => {
+      this.getAllPaths();
+    });
+  }
+
+  deletePath(uuid: string) {
+    this.http.delete(
+      this.baseURL + '/api/watch/path/' + uuid
     )
     .subscribe((res) => {
       this.getAllPaths();
@@ -50,11 +80,30 @@ export class DashboardComponent {
   }
 
   openDialog() {
-    console.log('test');
+    // console.log('test');
   }
 
-  receiveMessage($event) {
+  receiveAddMessage($event) {
     this.message = $event;
     this.addPath(this.message);
+  }
+
+  receiveDeleteMessage($event) {
+    this.message = $event;
+    this.deletePath(this.message);
+  }
+
+  loadSkeletonData() {
+    const skeletonEntry = {
+      directory: {
+          id: 'dummy',
+          createDate: '0000-00-00 00:00',
+          directoryPath: '...',
+          fileSize: '—',
+          fileType: faFolder
+        },
+    };
+    const skeletonArray = new Array(10).fill(skeletonEntry);
+    this.pathLists = skeletonArray;
   }
 }

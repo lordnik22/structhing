@@ -28,6 +28,10 @@ a {
     flex: 1 1 auto;
 }
 
+/* .mat-mdc-icon-button.mat-mdc-button-base {
+    --mdc-icon-button-state-layer-size: 1rem;
+} */
+
 /** FONTS **/
 @font-face {
     font-family: 'SourceCodePro';

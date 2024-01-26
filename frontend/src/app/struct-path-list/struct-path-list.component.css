@@ -1,3 +1,24 @@
 :host {
     display: contents;
 }
+
+span > fa-icon {
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+.file,
+.size,
+.date,
+.more {
+    line-height: 3rem;
+}
+
+
+.file {
+    text-align: left;
+}
+.size,
+.date {
+    text-align: right;
+}

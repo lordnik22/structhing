@@ -1,16 +1,21 @@
 .file-listing {
     display: grid;
     gap: 1rem 4rem;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto auto auto;
     font-family: 'SourceCodePro';
 }
 .file-listing .file,
 .file-listing .size,
-.file-listing .date {
+.file-listing .date,
+.file-listing .more {
     font-weight: bold;
 }
 
 .file-listing .size,
 .file-listing .date {
     text-align: right;
+}
+
+.file-listing .more {
+    text-align: center;
 }

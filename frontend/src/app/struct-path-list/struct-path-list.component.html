@@ -1,4 +1,6 @@
-<!-- <app-struct-file-list *ngFor="let fileList of fileLists">
-</app-struct-file-list> -->
-<app-struct-file-list>
-</app-struct-file-list>
+<span class="file"><fa-icon [icon]="pathList.fileType"></fa-icon>{{pathList.directoryPath}}</span>
+<span class="size">{{pathList.fileSize}}</span>
+<span class="date">{{pathList.createDate}}</span>
+<button mat-icon-button (click)="delete(pathList.id)">
+    <mat-icon>delete</mat-icon>
+</button>

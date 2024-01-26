@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { faFolder, faFile } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-struct-file-list',
@@ -7,6 +6,5 @@ import { faFolder, faFile } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./struct-file-list.component.css']
 })
 export class StructFileListComponent {
-  faFolder = faFolder;
-  // faFolder = faFile;
+
 }
