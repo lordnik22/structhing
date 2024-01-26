@@ -49,41 +49,42 @@ public class ProcessOnlyPdfStrategy
                         .map(a -> a.replace(",", ""))
                         .map(a -> a.replace(File.separator, ""))
                         .collect(Collectors.toList());
-
-                // AI Themen
-                // Ist AI-predict langsam?
-                // ISt AI Model laufen auf Customer Gerät, machbar? sinnhaft?
-                String stringPath = child.getParent().toAbsolutePath()
-                        + File.separator
-                        + words.get(0)
-                        + words.get(1)
-                        + words.get(2);
-                int counter = 0;
-                Path newPathName = Path.of(stringPath + PDF);
-                while(Files.exists(newPathName)) {
-                    if (counter >= Integer.MAX_VALUE) {
-                        throw new RuntimeException("I cant handle that anymore");
-                    } else {
-                        counter++;
+                if (words.size() > 3) {
+                    // AI Themen
+                    // Ist AI-predict langsam?
+                    // ISt AI Model laufen auf Customer Gerät, machbar? sinnhaft?
+                    String stringPath = child.getParent().toAbsolutePath()
+                            + File.separator
+                            + words.get(0)
+                            + words.get(1)
+                            + words.get(2);
+                    int counter = 0;
+                    Path newPathName = Path.of(stringPath + PDF);
+                    while (Files.exists(newPathName)) {
+                        if (counter >= Integer.MAX_VALUE) {
+                            throw new RuntimeException("I cant handle that anymore");
+                        } else {
+                            counter++;
+                        }
+                        newPathName = Path.of(stringPath + COUNTER_SEPARATOR + counter + PDF);
                     }
-                    newPathName = Path.of(stringPath + COUNTER_SEPARATOR + counter + PDF);
+                    System.out.println("our new file name: " + stringPath);
+                    if ((counter >= 0)
+                            && dsl.fetchExists(dsl.selectOne()
+                            .from(Tables.STRUCT_WATCH_FILE)
+                            .where(Tables.STRUCT_WATCH_FILE.CURRENT_FILE_PATH.eq(child.toAbsolutePath().toString())))) {
+                        return;
+                    } else {
+                        Files.move(child, newPathName, StandardCopyOption.ATOMIC_MOVE);
+                        dsl.insertInto(Tables.STRUCT_WATCH_FILE, Tables.STRUCT_WATCH_FILE.CURRENT_FILE_PATH, Tables.STRUCT_WATCH_FILE.OLD_FILE_PATH)
+                                .values(newPathName.toAbsolutePath().toString(),
+                                        child.toAbsolutePath().toString())
+                                .execute();
+                    }
                 }
-                System.out.println("our new file name: " + stringPath);
-                if ((counter >= 0)
-                        && dsl.fetchExists(dsl.selectOne()
-                        .from(Tables.STRUCT_WATCH_FILE)
-                        .where(Tables.STRUCT_WATCH_FILE.CURRENT_FILE_PATH.eq(child.toAbsolutePath().toString())))) {
-                    return;
-                } else {
-                    Files.move(child, newPathName, StandardCopyOption.ATOMIC_MOVE);
-                    dsl.insertInto(Tables.STRUCT_WATCH_FILE, Tables.STRUCT_WATCH_FILE.CURRENT_FILE_PATH,Tables.STRUCT_WATCH_FILE.OLD_FILE_PATH)
-                            .values(newPathName.toAbsolutePath().toString(),
-                                    child.toAbsolutePath().toString())
-                            .execute();
+                } catch(IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
