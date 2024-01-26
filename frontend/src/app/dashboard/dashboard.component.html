@@ -1,0 +1,10 @@
+<app-loader [isLoading]="loadingStatus">
+</app-loader>
+<div class="file-listing">
+    <span class="file">Directory</span><span class="size">Size</span><span class="date">Date</span><span class="more"><mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="more_vert"></mat-icon></span>
+    <div style="display: contents;" *ngFor="let pathList of pathLists">
+        <app-struct-path-list [pathList]="pathList.directory" (messageEvent)="receiveDeleteMessage($event)"></app-struct-path-list>
+    </div>
+</div>
+<app-dialog (messageEvent)="receiveAddMessage($event)">
+</app-dialog>

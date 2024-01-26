@@ -1,14 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
+  styleUrls: ['./app.component.css'],
   templateUrl: './app.component.html',
-  providers: [HttpClientModule]
 })
-export class AppComponent {
-  constructor(private httpClient: HttpClient) {
-  }
 
-  serverMessage = this.httpClient.get<{message: string}>("api/message");
+export class AppComponent {
 }

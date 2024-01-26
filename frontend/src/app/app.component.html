@@ -1,10 +1,22 @@
-<div>
-    Hi! Ciao! Salut! Hoi!
-    Here you get the message from Java:
-</div>
-<div>{{(serverMessage | async)?.message}}</div>
-<app-content-area></app-content-area>
+<mat-toolbar>
+    <button mat-icon-button aria-label="Show/hide navigation" (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <a class="title" routerLink="['/']">Structhing</a>
+    <span class="flex-spacer"></span>
+    <div class="logo-wrapper">
+        <img class="logo" src="assets/logo.svg">
+    </div>
+</mat-toolbar>
 
+<mat-sidenav-container class="example-container">
+    <mat-sidenav #sidenav mode="side" opened class="example-sidenav">
+        <app-navigation></app-navigation>
+    </mat-sidenav>
 
-
-
+    <mat-sidenav-content>
+        <div class="content-wrapper">
+            <router-outlet></router-outlet>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

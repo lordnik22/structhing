@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>Add path</h1>
+<div mat-dialog-content>
+  <p>Paste the path you want to observe</p>
+  <mat-form-field>
+    <mat-label>Observable Path</mat-label>
+    <input matInput [(ngModel)]="data.path" placeholder="Like C:\Users\johndoe\Downloads">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">cancel</button>
+  <button mat-button [mat-dialog-close]="data.path" cdkFocusInitial color="primary">Add</button>
+</div>
