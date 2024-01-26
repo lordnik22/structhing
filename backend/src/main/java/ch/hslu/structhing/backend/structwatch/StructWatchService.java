@@ -1,5 +1,6 @@
 package ch.hslu.structhing.backend.structwatch;
 
+import ch.hslu.structhing.backend.api.model.EmptyStructWatchPath;
 import ch.hslu.structhing.backend.api.model.StructWatchPath;
 import ch.hslu.structhing.backend.jooq.generated.Tables;
 import ch.hslu.structhing.backend.mapper.StructWatchMapper;
@@ -7,6 +8,10 @@ import org.jooq.DSLContext;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Optional;
+import java.util.UUID;
+
+import static ch.hslu.structhing.backend.jooq.generated.Tables.STRUCT_WATCH_PATH;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 
@@ -23,17 +28,24 @@ public class StructWatchService {
         this.dsl = dsl;
     }
 
+    public void unregister(UUID id) {
+        dsl.deleteFrom(STRUCT_WATCH_PATH)
+                .where(STRUCT_WATCH_PATH.ID.eq(id))
+                .execute();
+    }
+
     public void register(StructWatchPath dir) throws IOException {
         if (dir.getInitalProcessFlag()) {
             initalProcess(dir);
         }
         Path path = Path.of(dir.getDirectoryPath());
         WatchKey key = path.register(watchService, ENTRY_CREATE);
-        dsl.insertInto(Tables.STRUCT_WATCH_PATH,
-                        Tables.STRUCT_WATCH_PATH.INITAL_PROCESS_FLAG,
-                        Tables.STRUCT_WATCH_PATH.DIRECTORY_PATH,
-                        Tables.STRUCT_WATCH_PATH.WATCH_PATH_TYPE,
-                        Tables.STRUCT_WATCH_PATH.WATCH_KEY)
+
+        dsl.insertInto(STRUCT_WATCH_PATH,
+                        STRUCT_WATCH_PATH.INITAL_PROCESS_FLAG,
+                        STRUCT_WATCH_PATH.DIRECTORY_PATH,
+                        STRUCT_WATCH_PATH.WATCH_PATH_TYPE,
+                        STRUCT_WATCH_PATH.WATCH_KEY)
                 .values(dir.getInitalProcessFlag(),
                         dir.getDirectoryPath(),
                         dir.getStrategyType().toString(),
@@ -51,9 +63,13 @@ public class StructWatchService {
                 return;
             }
 
-            StructWatchPath structWatchPath = dsl.selectFrom(Tables.STRUCT_WATCH_PATH)
-                    .where(Tables.STRUCT_WATCH_PATH.WATCH_KEY.eq(key.hashCode()))
-                    .fetchSingle(r -> StructWatchMapper.toModel(r));
+            Optional<StructWatchPath> checkStructWatchPath = dsl.selectFrom(STRUCT_WATCH_PATH)
+                    .where(STRUCT_WATCH_PATH.WATCH_KEY.eq(key.hashCode()))
+                    .fetchOptional(r -> StructWatchMapper.toModel(r));
+            if (!checkStructWatchPath.isPresent()){
+                key.cancel();
+            }
+            StructWatchPath structWatchPath = checkStructWatchPath.orElse(new EmptyStructWatchPath());
             Path dir = Path.of(structWatchPath.getDirectoryPath());
             if (dir == null) {
                 System.err.println("WatchKey not recognized!!");
@@ -79,13 +95,13 @@ public class StructWatchService {
             // reset key and remove from set if directory no longer accessible
             boolean valid = key.reset();
             if (!valid) {
-                dsl.delete(Tables.STRUCT_WATCH_PATH)
-                        .where(Tables.STRUCT_WATCH_PATH.WATCH_KEY.eq(key.hashCode()))
+                dsl.delete(STRUCT_WATCH_PATH)
+                        .where(STRUCT_WATCH_PATH.WATCH_KEY.eq(key.hashCode()))
                         .execute();
 
                 // all directories are inaccessible
                 if(!dsl.selectOne()
-                        .from(Tables.STRUCT_WATCH_PATH)
+                        .from(STRUCT_WATCH_PATH)
                         .fetchOptional()
                         .isPresent()) {
                     break;
@@ -115,3 +131,5 @@ public class StructWatchService {
         }
     }
 }
+
+

@@ -1,7 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
-import { DialogComponent } from '../dialog/dialog.component';
-import { faFolder, faFile } from '@fortawesome/free-solid-svg-icons';
+import { Component } from '@angular/core';
+import { faFolder } from '@fortawesome/free-solid-svg-icons';
+import { v4 as uuidv4 } from 'uuid';
+import { ProcessWatchPathType } from '../shared/model/ProcessWatchPathType';
+import { StructWatchPath } from '../shared/model/StructWatchPath.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -63,7 +65,7 @@ export class DashboardComponent {
   addPath(path: string) {
     this.http.put(
       this.baseURL + '/api/watch/path',
-      path
+      new StructWatchPath(uuidv4(), path, true, Date.now(), ProcessWatchPathType.PDF_ONLY)
     )
     .subscribe((res) => {
       this.getAllPaths();
