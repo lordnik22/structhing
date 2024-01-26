@@ -47,7 +47,7 @@ public class Application {
 
     public static void main(String[] args)
             throws IOException {
-        DSLContext dsl = DSL.using("jdbc:h2:/home/lordnik/Documents/structhing/backend/src/main/resources/database/structhing", "sa", "");
+        DSLContext dsl = DSL.using("jdbc:h2:./backend/src/main/resources/database/structhing", "sa", "");
         StructWatchService watchService1 = new StructWatchService(FileSystems.getDefault().newWatchService(), dsl);
         new Application(watchService1, Executors.newFixedThreadPool(2), dsl).start();
     }
