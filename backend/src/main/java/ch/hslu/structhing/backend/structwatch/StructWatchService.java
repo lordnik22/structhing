@@ -5,6 +5,13 @@ import ch.hslu.structhing.backend.api.model.StructWatchPath;
 import ch.hslu.structhing.backend.jooq.generated.Tables;
 import ch.hslu.structhing.backend.mapper.StructWatchMapper;
 import org.jooq.DSLContext;
+import org.jooq.Result;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.jooq.Record;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -131,5 +138,3 @@ public class StructWatchService {
         }
     }
 }
-
-

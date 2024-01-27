@@ -1,6 +1,6 @@
 
 CREATE TABLE IF NOT EXISTS public.struct_watch_path (
-    id UUID,
+    id UUID default random_uuid() PRIMARY KEY,
     create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     directory_path CHARACTER VARYING NOT NULL,
     watch_key INTEGER,

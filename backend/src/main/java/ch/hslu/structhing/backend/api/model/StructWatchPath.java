@@ -20,7 +20,8 @@ public class StructWatchPath implements Serializable {
         // default constructor for jaxxon
     }
 
-    public StructWatchPath(String directoryPath, boolean initalProcessFlag, Timestamp createTimestamp, ProcessWatchPathType strategyType){
+    public StructWatchPath(UUID id, String directoryPath, boolean initalProcessFlag, Timestamp createTimestamp, ProcessWatchPathType strategyType){
+        this.id = id;
         this.directoryPath = directoryPath;
         this.initalProcessFlag = initalProcessFlag;
         this.createTimestamp = createTimestamp;

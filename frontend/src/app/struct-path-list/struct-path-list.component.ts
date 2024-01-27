@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IconDefinition, Icon } from '@fortawesome/fontawesome-svg-core';
-import { faFolder, faFile } from '@fortawesome/free-solid-svg-icons';
+import { faFolder } from '@fortawesome/free-solid-svg-icons';
 
 interface IStructPath {
   id: string,
@@ -18,6 +18,7 @@ interface IStructPath {
 export class StructPathListComponent {
   @Input() pathList: IStructPath;
   @Output() messageEvent = new EventEmitter<string>();
+  folderIcon = faFolder;
 
   delete(id) {
     this.messageEvent.emit(id);

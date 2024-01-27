@@ -11,10 +11,12 @@ import java.time.ZoneOffset;
 public class StructWatchMapper {
 
     public static StructWatchPath toModel(StructWatchPathRecord record) {
-        StructWatchPath structWatchPath = new StructWatchPath(record.getDirectoryPath(),
-                record.getInitalProcessFlag(),
-                Timestamp.valueOf(record.getCreateTimestamp()),
-                ProcessWatchPathType.valueOf(record.getWatchPathType()));
+        StructWatchPath structWatchPath = new StructWatchPath(
+            record.getId(),
+            record.getDirectoryPath(),
+            record.getInitalProcessFlag(),
+            Timestamp.valueOf(record.getCreateTimestamp()),
+            ProcessWatchPathType.valueOf(record.getWatchPathType()));
         return structWatchPath;
     }
 }

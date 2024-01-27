@@ -1,6 +1,6 @@
-<span class="file"><fa-icon [icon]="pathList.fileType"></fa-icon>{{pathList.directoryPath}}</span>
+<span class="file"><fa-icon [icon]="folderIcon"></fa-icon>{{pathList.directoryPath}}</span>
 <span class="size">{{pathList.fileSize}}</span>
-<span class="date">{{pathList.createDate}}</span>
+<span class="date">{{pathList.createDate | date: 'yyyy-MM-dd HH:mm:ss'}}</span>
 <button mat-icon-button (click)="delete(pathList.id)">
     <mat-icon>delete</mat-icon>
 </button>
