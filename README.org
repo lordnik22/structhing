@@ -24,3 +24,11 @@ Steps:
   java -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -jar ./delivery/target/structhing.jar
 #+end_src
 4. Open the browser with URL http://localhost:7070/
+
+** Debugging
+If you get a 404 Not Found Error then the Frontend hasn’t been copied
+correctly into the jar. Executing:
+#+begin_src bash
+  mvn clean package
+#+end_src
+again, can fix the problem.
