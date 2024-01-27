@@ -39,3 +39,5 @@ build/
 
 /src/main/java/ch/hslu/structhing/backend/jooq/**
 /src/main/java/ch/hslu/structhing/backend/public/**
+
+*.mv.db
